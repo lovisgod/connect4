@@ -4,6 +4,7 @@ class Connect4 {
     constructor(selector) {
         this.ROWS = 6;
         this.COL = 7;
+        this.player = 'red';
         this.selector = selector;
         this.createGrid(); 
         this.setUpEventListener();
@@ -31,7 +32,7 @@ createGrid(){
 //this method set up an event listener on the board div
 setUpEventListener(){
     const board = $(this.selector); //get the board div
-
+    const that = this; // this gives us access to original this (the main this property of the consturctor)
 
     // here we want to check to each coumn and find the empty column
     function findLastEmptyCell(col){
@@ -44,20 +45,28 @@ setUpEventListener(){
             }
         }
         return null;
-        console.log(cells);
     }
 
     // this checks the element on which mouse hovers and performs a function on the element
     board.on('mouseenter', '.col.empty', function() {
         const col = $(this).data('col');
         const $lastEmptyCell = findLastEmptyCell(col);
-        $lastEmptyCell.addClass(`next-red`); //here we add a class that changes the color to red to the returned cell from findlastempty cell function
-        console.log('col:'+col);
+        $lastEmptyCell.addClass(`next-${that.player}`); //here we add a class that changes the color to red to the returned cell from findlastempty cell function
     });
 
     board.on('mouseleave','.col', function(){
-        $('.col').removeClass(`next-red`);
-    })
+        $('.col').removeClass(`next-${that.player}`);
+    });
+
+    board.on('click', '.col', function () { 
+
+        const col = $(this).data('col');
+        const $lastEmptyCell = findLastEmptyCell(col);
+        $lastEmptyCell.removeClass(`empty next-${that.player}`);
+        $lastEmptyCell.addClass(that.player);
+        that.player = (that.player === 'red')? 'black' : 'red';
+        $(this).trigger('mouseenter');
+     });
 }
 
-} 
+}   
